@@ -61,9 +61,14 @@ const Upload = () => {
             : feedback.message.content[0].text;
 
         data.feedback = JSON.parse(feedbackText);
-        await kv.set(`resume:${uuid}`, JSON.stringify(data));
+        const setSuccess = await kv.set(`resume:${uuid}`, JSON.stringify(data));
+        if (!setSuccess) {
+            console.error("❌ kv.set failed at the final step");
+        }
         setStatusText('Analysis complete, redirecting...');
-        console.log(data);
+        const finalCheck = await kv.get(`resume:${uuid}`);
+        console.log("🔍 Final saved resume from kv:", finalCheck);
+        navigate(`/resume/${uuid}`)
     }
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
